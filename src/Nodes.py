@@ -119,13 +119,15 @@ class MoveNode(BaseNode):
         pass
 
 def randomizeNodes():
-    rnd = random.randint(0, 15)
-    #print str(rnd)
-
     global depth
+
+    minRand = 0
+
     depth = depth + 1
     if depth > 60:
-        raise Exception()
+        minRand = 4
+
+    rnd = random.randint(0, 15)
 
     if rnd == 0:
         return AndNode(depth)
@@ -139,10 +141,7 @@ def randomizeNodes():
         return SensorNode(depth, random.randint(0,7))
     elif rnd >= 12 and rnd <= 15:
         return MoveNode(depth, random.randint(0,3))
-    #elif rnd >= 4 and rnd <= 11:
-    #    return SensorNode(rnd - 4)
-    #elif rnd >= 12 and rnd <= 15:
-    #    return MoveNode(rnd - 12)
+
 
 def generateNodes():
     global depth
