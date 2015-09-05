@@ -2,6 +2,24 @@ import random
 
 depth = 0
 
+track = None
+position = None
+result = 0
+
+def EvaluateTree(ttrack, pposition, tree):
+    global track, position, result
+    track = ttrack
+    position = pposition
+    result = 0
+
+    if not isinstance(tree, BaseNode): raise TypeError("Tree is not a BaseNode")
+    try:
+        tree.getResult();
+    except StepException:
+        pass
+
+    return result
+
 class BaseNode:
 
     parent = None
@@ -86,7 +104,6 @@ class SensorNode(BaseNode):
     directions = ["N", "NE", "E", "ES", "S", "SW", "W", "NW"]
 
     direction = 0
-    tile = None
 
     def __init__(self, nr, d):
         self.depth = nr
@@ -98,7 +115,26 @@ class SensorNode(BaseNode):
         return "S[" + self.directions[self.direction] + "]"
 
     def getResult(self):
-        return self.tile
+        global position, track
+        if self.direction == 0:
+            return 1 if track[position[0] - 1][position[1] + 0] == -1 else 0
+        elif self.direction == 1:
+            return 1 if track[position[0] - 1][position[1] + 1] == -1 else 0
+        elif self.direction == 2:
+            return 1 if track[position[0] + 0][position[1] + 1] == -1 else 0
+        elif self.direction == 3:
+            return 1 if track[position[0] + 1][position[1] + 1] == -1 else 0
+        elif self.direction == 4:
+            return 1 if track[position[0] + 1][position[1] + 0] == -1 else 0
+        elif self.direction == 5:
+            return 1 if track[position[0] + 1][position[1] - 1] == -1 else 0
+        elif self.direction == 6:
+            return 1 if track[position[0] + 0][position[1] - 1] == -1 else 0
+        elif self.direction == 7:
+            return 1 if track[position[0] - 1][position[1] - 1] == -1 else 0
+
+
+
 
 class MoveNode(BaseNode):
 
@@ -116,7 +152,19 @@ class MoveNode(BaseNode):
         return "M[" + self.directions[self.direction] + "]"
 
     def getResult(self):
-        pass
+        global position, track, result
+        if self.direction == 0:
+            position[0] = position[0] - 1
+        elif self.direction == 1:
+            position[1] = position[1] + 1
+        elif self.direction == 2:
+            position[0] = position[0] + 1
+        elif self.direction == 3:
+            position[1] = position[1] - 1
+
+        result = track[position[0]][position[1]]
+
+        raise StepException()
 
 def randomizeNodes():
     global depth
@@ -147,3 +195,7 @@ def generateNodes():
     global depth
     depth = 0
     return randomizeNodes()
+
+
+class StepException(Exception):
+    pass
