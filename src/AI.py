@@ -34,7 +34,7 @@ def Evaluate(tree, track):
         res = Nodes.EvaluateTree(track, startingPoint, tree)
         #print "Result of tree", str(tree), ":", result
         if res == -1:
-            return -1
+            return result
         result += res
 
     return result

@@ -162,7 +162,12 @@ class MoveNode(BaseNode):
         elif self.direction == 3:
             position[1] = position[1] - 1
 
-        result = track[position[0]][position[1]]
+        try:
+   	   result = track[position[0]][position[1]]
+	   if result == 1:
+	      track[position[0]][position[1]] = 0
+        except:
+	   print "failed at", position[0], ",", position[1]
 
         raise StepException()
 
