@@ -1,21 +1,20 @@
 #!/usr/bin/env python
-
-import Nodes
 import Track
+from Nodes import SensorNode, MoveNode, EvaluateTree, coord, setPos, getPos, setTrack
 
 def main():
-    Nodes.track = Track.Track.track
+    setTrack(Track.Track().track)
 
     """Testing SensorNode"""
 
-    sn = Nodes.SensorNode(0, 0)
-    Nodes.position = [5,5]
+    sn = SensorNode(0, 0)
+    setPos(coord(5, 5))
     for i in xrange(0,7):
         sn.direction = i
         result = sn.getResult()
         assert result == 0
 
-    Nodes.position = [1,5]
+    setPos(coord(5, 1))
 
     sn.direction = 0
     res = sn.getResult()
@@ -27,13 +26,29 @@ def main():
 
     """Testing MoveNode"""
 
-    mn = Nodes.MoveNode(0,0)
-    res = Nodes.EvaluateTree(Track.Track.track, [1,5], mn)
+    mn = MoveNode(0,0)
+    res = EvaluateTree(Track.Track().track, coord(5,1), mn)
     assert res == -1
 
     mn.direction = 1
-    res = Nodes.EvaluateTree(Track.Track.track, [1,5], mn)
+    res = EvaluateTree(Track.Track().track, coord(5,1), mn)
     assert res == 1
+
+    """Testing moveCounting"""
+
+    t = Track.Track()
+    mn = MoveNode(0,0)
+    res = EvaluateTree(t.track, coord(5,5), mn)
+    assert res == 0
+    res = EvaluateTree(t.track, getPos(), mn)
+    assert res == 0
+    res = EvaluateTree(t.track, getPos(), mn)
+    assert res == 0
+    res = EvaluateTree(t.track, getPos(), mn)
+    assert res == 1
+    res = EvaluateTree(t.track, getPos(), mn)
+    assert res == -1
+
 
 if __name__ == "__main__":
     main()

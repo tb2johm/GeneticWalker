@@ -3,13 +3,13 @@ import random
 depth = 0
 
 track = None
-position = None
+pos = None
 result = 0
 
-def EvaluateTree(ttrack, pposition, tree):
-    global track, position, result
-    track = ttrack
-    position = pposition
+def EvaluateTree(track, pos, tree):
+    global result
+    setTrack(track)
+    setPos(pos)
     result = 0
 
     if not isinstance(tree, BaseNode): raise TypeError("Tree is not a BaseNode")
@@ -19,6 +19,17 @@ def EvaluateTree(ttrack, pposition, tree):
         pass
 
     return result
+
+def setPos(ppos):
+    global pos
+    pos = ppos
+
+def getPos():
+    return pos
+
+def setTrack(ttrack):
+    global track
+    track = ttrack
 
 class BaseNode:
 
@@ -47,7 +58,9 @@ class AndNode(BaseNode):
         return "(" + str(self.a) + " && " + str(self.b) + ")"
 
     def getResult(self):
-        return self.a.getResult() and self.b.getResult()
+        ares = self.a.getResult()
+        bres = self.b.getResult()
+        return ares and bres
 
 
 class OrNode(BaseNode):
@@ -96,7 +109,7 @@ class IfNode(BaseNode):
         return "((" + str(self.a) + ")?(" + str(self.b) + "):(" + str(self.c) + "))"
 
     def getResult(self):
-        return self.a.getResult() if self.b.getResult() else self.c.getResult()
+        return self.b.getResult() if self.a.getResult() else self.c.getResult()
 
 class SensorNode(BaseNode):
 
@@ -115,23 +128,23 @@ class SensorNode(BaseNode):
         return "S[" + self.directions[self.direction] + "]"
 
     def getResult(self):
-        global position, track
+        global pos, track
         if self.direction == 0:
-            return 1 if track[position[0] - 1][position[1] + 0] == -1 else 0
+            return 1 if track[pos.y - 1][pos.x + 0] == -1 else 0
         elif self.direction == 1:
-            return 1 if track[position[0] - 1][position[1] + 1] == -1 else 0
+            return 1 if track[pos.y - 1][pos.x + 1] == -1 else 0
         elif self.direction == 2:
-            return 1 if track[position[0] + 0][position[1] + 1] == -1 else 0
+            return 1 if track[pos.y + 0][pos.x + 1] == -1 else 0
         elif self.direction == 3:
-            return 1 if track[position[0] + 1][position[1] + 1] == -1 else 0
+            return 1 if track[pos.y + 1][pos.x + 1] == -1 else 0
         elif self.direction == 4:
-            return 1 if track[position[0] + 1][position[1] + 0] == -1 else 0
+            return 1 if track[pos.y + 1][pos.x + 0] == -1 else 0
         elif self.direction == 5:
-            return 1 if track[position[0] + 1][position[1] - 1] == -1 else 0
+            return 1 if track[pos.y + 1][pos.x - 1] == -1 else 0
         elif self.direction == 6:
-            return 1 if track[position[0] + 0][position[1] - 1] == -1 else 0
+            return 1 if track[pos.y + 0][pos.x - 1] == -1 else 0
         elif self.direction == 7:
-            return 1 if track[position[0] - 1][position[1] - 1] == -1 else 0
+            return 1 if track[pos.y - 1][pos.x - 1] == -1 else 0
 
 
 
@@ -152,22 +165,24 @@ class MoveNode(BaseNode):
         return "M[" + self.directions[self.direction] + "]"
 
     def getResult(self):
-        global position, track, result
+        global pos, track, result
+        #print "Move dir=%d from (%d, %d)" % (self.direction, pos.x, pos.y)
         if self.direction == 0:
-            position[0] = position[0] - 1
+            pos.y = pos.y - 1
         elif self.direction == 1:
-            position[1] = position[1] + 1
+            pos.x = pos.x + 1
         elif self.direction == 2:
-            position[0] = position[0] + 1
+            pos.y = pos.y + 1
         elif self.direction == 3:
-            position[1] = position[1] - 1
+            pos.x = pos.x - 1
 
-        try:
-   	   result = track[position[0]][position[1]]
-	   if result == 1:
-	      track[position[0]][position[1]] = 0
-        except:
-	   print "failed at", position[0], ",", position[1]
+        result = track[pos.y][pos.x]
+        if result in [4, 8]:
+            result = 0
+        if result == 1:
+            track[pos.y][pos.x] = 8
+        else:
+            track[pos.y][pos.x] = 4
 
         raise StepException()
 
@@ -201,6 +216,19 @@ def generateNodes():
     depth = 0
     return randomizeNodes()
 
+def merge(node1, node2):
+    return (node1, node2)
 
 class StepException(Exception):
     pass
+
+class coord():
+    x = 0
+    y = 0
+
+    def __init__(self, x = 0, y = 0):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return "(x=%d, y=%d)" % (self.x, self.y)
