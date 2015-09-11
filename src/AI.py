@@ -16,31 +16,58 @@ def main():
     #for i in xrange(0, len(treeList)):
     #    print str(treeList[i])
 
+    totalGenWinner = None
+    totalGenWinnerPoints = 0
+    genWinnerTrack = None
+
     for i in xrange(0, len(treeList)):
         a = treeList[random.randint(0, len(treeList)) - 1]
         b = treeList[random.randint(0, len(treeList)) - 1]
         c = treeList[random.randint(0, len(treeList)) - 1]
         d = treeList[random.randint(0, len(treeList)) - 1]
 
-        pointA = Evaluate(a, Track.Track().track)
-        pointB = Evaluate(b, Track.Track().track)
+        ta = Track.Track()
+        tb = Track.Track()
+        pointA = Evaluate(a, ta.track)
+        pointB = Evaluate(b, tb.track)
         if a > b:
             winner1 = a
             looser1 = b
+            if pointA > totalGenWinnerPoints:
+                totalGenWinnerPoints = pointA
+                totalGenWinner = a
+                genWinnerTrack = ta
         else:
             winner1 = b
             looser1 = a
+            if pointB > totalGenWinnerPoints:
+                totalGenWinnerPoints = pointB
+                totalGenWinner = b
+                genWinnerTrack = tb
 
-        pointC = Evaluate(c, Track.Track().track)
-        pointD = Evaluate(d, Track.Track().track)
+        tc = Track.Track()
+        td = Track.Track()
+        pointC = Evaluate(c, tc.track)
+        pointD = Evaluate(d, td.track)
         if c > d:
             winner2 = c
             looser2 = d
+            if pointC > totalGenWinnerPoints:
+                totalGenWinnerPoints = pointC
+                totalGenWinner = c
+                genWinnerTrack = tc
         else:
             winner2 = d
             looser2 = c
+            if pointD > totalGenWinnerPoints:
+                totalGenWinnerPoints = pointD
+                totalGenWinner = d
+                genWinnerTrack = td
 
         (looser1, looser2) = Nodes.merge(winner1, winner2)
+
+    print "Total generation winner, with %d points is: %s" % (totalGenWinnerPoints, totalGenWinner)
+    print genWinnerTrack
 
         #print "tree:", str(treeList[i]), "got:", pointA
 
